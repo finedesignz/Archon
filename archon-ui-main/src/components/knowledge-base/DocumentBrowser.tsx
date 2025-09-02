@@ -28,13 +28,7 @@ const extractDomain = (url: string): string => {
     // Remove 'www.' prefix if present
     const withoutWww = hostname.startsWith('www.') ? hostname.slice(4) : hostname;
     
-    // For domains with subdomains, extract the main domain (last 2 parts)
-    const parts = withoutWww.split('.');
-    if (parts.length > 2) {
-      // Return the main domain (last 2 parts: domain.tld)
-      return parts.slice(-2).join('.');
-    }
-    
+    // Keep full hostname (minus 'www.') to preserve subdomain-level filtering
     return withoutWww;
   } catch {
     return url; // Return original if URL parsing fails
