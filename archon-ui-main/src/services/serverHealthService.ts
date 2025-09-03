@@ -5,8 +5,8 @@ interface HealthCheckCallback {
   onReconnected: () => void;
 }
 
-// Health check interval constant - 30 seconds for reasonable balance
-const HEALTH_CHECK_INTERVAL_MS = 30000; // 30 seconds
+// Health check interval constant - increased to reduce load and prevent freezing
+const HEALTH_CHECK_INTERVAL_MS = 60000; // 60 seconds - reduced frequency to prevent overload
 
 class ServerHealthService {
   private healthCheckInterval: number | null = null;
@@ -67,7 +67,7 @@ class ServerHealthService {
     // Load settings first
     this.loadSettings();
 
-    // Start HTTP health polling
+    // Start HTTP health polling with longer interval to reduce load
     this.healthCheckInterval = window.setInterval(async () => {
       const isHealthy = await this.checkHealth();
       
@@ -133,7 +133,8 @@ class ServerHealthService {
     this.isConnected = false;
     this.missedChecks = this.maxMissedChecks; // Set to max to ensure disconnect screen shows
     
-    if (this.disconnectScreenEnabled && this.callbacks) {
+    // Temporarily disabled to prevent refresh loop
+    if (false && this.disconnectScreenEnabled && this.callbacks) {
       console.log('🏥 [Health] Triggering disconnect screen immediately');
       this.callbacks.onDisconnected();
     }

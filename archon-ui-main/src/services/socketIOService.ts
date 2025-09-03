@@ -152,17 +152,18 @@ export class WebSocketService {
       console.log('🔗 Session ID:', this.sessionId);
       
       // Connect to default namespace with explicit origin to ensure proxy usage
+      // Optimized configuration for Docker environment to prevent freezing
       this.socket = io(connectionUrl, {
-        reconnection: this.config.enableAutoReconnect,
-        reconnectionAttempts: this.config.maxReconnectAttempts,
-        reconnectionDelay: this.config.reconnectInterval,
-        reconnectionDelayMax: 30000,
+        reconnection: false, // Disable auto-reconnect to prevent connection storms
+        reconnectionAttempts: 0,
         timeout: 10000,
-        transports: ['websocket', 'polling'],
+        transports: ['polling'], // Force polling only - WebSocket upgrade fails in Docker dev
         path: socketPath,
         query: {
           session_id: this.sessionId
-        }
+        },
+        forceNew: true, // Force new connection
+        multiplex: false // Prevent connection reuse
       });
       
       console.log('🔗 Socket.IO instance created, setting up event handlers...');

@@ -295,13 +295,21 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             proxy.on('proxyReq', (proxyReq, req, res) => {
               console.log('🔄 [VITE PROXY] Forwarding:', req.method, req.url, 'to', `http://${host}:${port}${req.url}`);
             });
+            proxy.on('upgrade', (req, socket, head) => {
+              console.log('🔄 [VITE PROXY] WebSocket upgrade:', req.url);
+            });
           }
         },
         // Socket.IO specific proxy configuration
         '/socket.io': {
           target: `http://${host}:${port}`,
           changeOrigin: true,
-          ws: true
+          ws: true,
+          configure: (proxy, options) => {
+            proxy.on('upgrade', (req, socket, head) => {
+              console.log('🔄 [VITE PROXY] Socket.IO WebSocket upgrade:', req.url);
+            });
+          }
         }
       },
     },
